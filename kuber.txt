@@ -1,0 +1,139 @@
+What is kubernetes?
+Kubernetes is a portable, extensible, open-source platform for managing workloads.
+It is a managed, production-ready environment for deploying containerized applications.
+It is a container orchestrator
+Kubernetes is a system for automating deployment, scheduling and scaling (container instances) of containerized applications
+
+Application containerization - OS level virtualization to deploy and run distributed application.
+Multiple isolated applications or services run on a single host and access the same OS krnel
+
+How it works? - include the runtime components (image)
+
+Container engine - deploying images on host
+
+The oldest way was applications on host (entangling with host OS and infrastructure)
+
+The older way(VMs) was heavyweight, non-portable and relies on OS package manager
+
+The new way (containers) is small, fast and portable across clouds and OS distributions.
+
+Benefits
+1. Efficiency for memory, CPU and storage.
+2. Portability.
+Drawbacks
+1.Lack of isolation from core OS
+2. No protection or lack of security
+
+Kubernetes vs Docker (Swarm)
+Kubernetes is a container orchestration solution.
+Orchestration - execution of a defined workflow
+
+Kubernetes, Docker Swarm, Mesos, Titus
+
+Kubernetes provides a container-centric management environment
+Platform as a Service(PaaS) - AWS Elastic Beanstalk, Microsoft Azure, Heroku
+
+
+Features provided (container level) - deployment, scaling, load balancing, logging, monitoring
+Supported workloads - stateless, stateful, data-processing
+(CI/CD) Continuous Integration, Delivery and Deployment
+Features not provided (application lvel) - middleware, data processing frameworks, databases, caches, cluster storage systems
+
+Kubernetes means pilot, governor    K8s
+
+Master components - control plane, making global decisions, detect and respond to cluster events
+1. kube-apiserver - front-end for control plane
+2. etcd - key value store for all cluster data
+3. kube-scheduler - watches newly created pods and selects a node for them to run on
+4. kube-controller-manager - runs controllers. controllers are compiled together and run as a single process
+	Types of controllers include -
+		i) Node controller
+		ii) Replication controller
+		iii) Endpoints controller
+		iv) Service account & token controllers
+5. cloud-controller-manager - runs controllers that interact with underlying cloud provider
+
+containers -> pods -> nodes -> cluster -> master components
+
+Pods - container for containers. Inside a pod, containers share same resources and local network. They can communicate but they still maintain isolation. At a time, replicas of your pod should be running to allow load balancing, failure resistance
+
+Node - Smallest unit of computing hardware. Simply viewing each machine as a set of CPU and RAM resources
+Node COmponents - 
+1. kubelet - makes sure that containers run inside a pod
+2. kube-proxy - enables k8s service abstraction by maintaining network rules and connection forwarding
+3. Container Runtime
+
+Cluster - nodes pool their resources together to make a big powerful machine. It intelligently distributes work to individual nodes
+
+Persistent - plugging cloud drives or external hard disk to the cluster to store data permanently
+
+1. Install Google Cloud SDk
+2. Kubernetes cmd - gcloud components install kubectl
+3. Install Docker
+4. Install git (git-scm.com)
+
+1. git clone <url>
+2. cd <dir>
+3. gcloud auth configure-docker (use once only)
+4. docker build -t name:tag
+docker build -t gcr.io/cloudshell-k8stest2-223806/hello-app:v1 .
+
+gcr means google container registry 
+
+5. docker images
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
