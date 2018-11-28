@@ -69,71 +69,76 @@ Persistent - plugging cloud drives or external hard disk to the cluster to store
 
 1. Install Google Cloud SDk
 2. Kubernetes cmd - gcloud components install kubectl
-3. Install Docker
+3. Install Docker or Docker Toolbox
 4. Install git (git-scm.com)
 
 1. git clone <url>
 2. cd <dir>
 3. gcloud auth configure-docker (use once only)
+
+Step 1 -> Build docker container image
+
 4. docker build -t name:tag
 docker build -t gcr.io/cloudshell-k8stest2-223806/hello-app:v1 .
 
-gcr means google container registry 
+ 
 
 5. docker images
 
+Step 2 -> Upload the container image to GCR (gcr means google container registry)
+
+docker push gcr.io/k8stest2-223806/hello-app:v1
+
+Step 3 -> Create a container cluster
+gcloud container clusters create hello-cluster --num-nodes=3 --zone=asia-south1-a
+
+gcloud compute instances list
+
+((gcloud container clusters get-credentials hello-cluster)) 
+
+gcloud compute regions list
+gcloud compute zones list
+
+Step 4 -> Deploy our application
+
+kubectl run hello-web2 --image=gcr.io/k8stest2-223806/hello-app:v1 --port 8080
+(run <-> create deployment) Deployment manages replicas of our application, schedules them to run on nodes
+kubectl get pods
 
 
+Step 5-> Exposing the application on internet
 
+kubectl expose deployment hello-web2 --type=LoadBalancer --port 80 --target-port 8080
+(expose <-> create service) Service providing networking and IP support to our appn's pods
 
+kubectl get service
 
+Open browser -> http://<external-ip>
 
+Step 6 -> Scale up our application
 
+kubectl scale deployment hello-web2 --replicas=3
 
+kubectl get deployment hello-web2
 
+kubectl get pods
 
+(scale command adjusts capacity of our application. LoadBalancer routes traffic to new replicas immediately
 
+Step 7 -> Deploy a new version of your app
 
+kubectl set image <type>/<name> name=new image
+kubectl set image deployment/hello-web2 hello-web2=gcr.io/k8stest2-223806/hello-app:v2
 
+Open browser -> http://<external-ip>
 
+Step 8 -> Cleaning up
 
+i) Delete the service
+kubectl delete service hello-web2
 
+ii) Verifying that LoadBalancer (service) has been deleted
+gcloud compute forwarding-rules list
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+iii)Delete the container cluster
+gcloud container clusters delete hello-cluster --zone=asia-south1-a
