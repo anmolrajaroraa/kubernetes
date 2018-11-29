@@ -79,7 +79,7 @@ Persistent - plugging cloud drives or external hard disk to the cluster to store
 Step 1 -> Build docker container image
 
 4. docker build -t name:tag
-docker build -t gcr.io/cloudshell-k8stest2-223806/hello-app:v1 .
+docker build -t gcr.io/k8stest2-223806/hello-app:v1 .
 
  
 
@@ -142,3 +142,132 @@ gcloud compute forwarding-rules list
 
 iii)Delete the container cluster
 gcloud container clusters delete hello-cluster --zone=asia-south1-a
+
+Misc commands -
+1. gcloud config set project k8stest2-223806
+2. gcloud config set compute/zone us-central1-b
+3. Run your container locally
+	docker run --rm -p 8080:8080 gcr.io/k8stest2-223806/hello-app:v1
+	then	
+	Preview on port 8080 button
+	or
+	open a new shell window -> curl http://localhost:8080
+
+
+K8s deployment strategies
+1. Recreate -> Terminate the old version and release the new one
+	Best for development environment
+Pro : Application state is entirely renewed
+Con : Downtime that depends on both shutdown and boot duration of the application
+
+
+
+
+spec:
+	replicas:3
+	strategy:
+		type:Recreate
+
+
+
+
+
+2. Ramped -> Release a new version in a rolling update fashion, one after the other
+	Best for slow rollout
+Pro:Version is released slowly
+Convenient for stateful applications so that they can handle rebalancing of data
+Con:Rollout/rollback can take some time
+No control over traffic
+
+
+
+spec:
+	strategy:
+		type:RoliingUpdate
+		rollingUpdate:
+			maxSurge:2    #how many pods we can add at a time
+			maxUnavailable:0 
+
+
+
+3. Blue/green -> Release a new version alongside the older version and then switch traffic
+	Best to avoid versioning issues
+Pro:Version is released instantly
+Change the entire cluster state in a go
+Con:Requires the double resources
+Proper testing should be done before switching the traffic
+Handling stateful applications can be hard
+
+
+
+selector:
+	version: v2.0.0
+
+
+
+
+
+
+4. Canary -> Release a new version to a subset of users, then we proceed to a full rollout
+	Best for consumer testing
+	HAproxy, Linkerd
+
+
+
+spec:
+	replicas:3
+
+
+
+spec:
+	replicas:1
+
+
+
+
+5. A/B testing -> Release a new version to a subset of users but in a precise way(using Http headers and cookies). A/B testing is really a technique for business decisions based on statistics. Istio
+Pro: Several versions run in parallel
+Con:You have to set up additional tools
+Hard to troubleshoot
+
+
+
+route:
+-tags:
+	version:v1.0.0
+	weight:90
+-tags:
+	version:v2.0.0
+	weight:10
+
+
+
+Common issues:
+Pods in Pending, CrashLoopBackOff, Waiting, ErrImagePull
+non-responsive pods containers
+Difficulty in finding external IP
+
+Pod status is Pending, CrashLoopBackOff
+Typically because of insufficent CPU or memory resources or absence of volume provider
+kubectl get pods -> Show the Pod_uid
+kubectl describe pod pod_uid
+
+Pod status show ErrImagePull, ImagePullBackOff
+kubectl get pods
+kubectl describe pod pod_uid
+docker pull images
+
+
+Unable to find your nodes
+kubectl get nodes -> server doesnt have a resource
+Occurs because authentication credentials are not correct
+
+Difficulty in finding external IP
+minikube ip
+kubectl get nodes -o yaml
+
+
+Pod is running but not responding
+Occurs because of incorrect config or insufficient storage
+ps
+Status  Restarts  Ready
