@@ -271,3 +271,67 @@ Pod is running but not responding
 Occurs because of incorrect config or insufficient storage
 ps
 Status  Restarts  Ready
+
+
+Kubernetes with KOPS on AWS
+
+WSL -> Windows Subsytem for Linux
+
+Prerequisite for Windows : Install Ubuntu 
+
+Step 1 -> Create an AWS account (www.aws.amazon.com/free)
+
+Step 2 -> Install python 
+	sudo apt-get install python2.7
+
+Step 3 -> Install pip
+	sudo apt-get install python-pip
+	If error comes -> (sudo apt-get update && sudo apt-get -y update) then use (sudo apt-get install python-pip)
+	pip -V
+
+Step 4 -> Install AWS CLI
+	pip install awscli --upgrade --user
+	aws --version
+
+	if error comes -> which python
+			ls -al /usr/bin/python
+			ls -a    				(.local, .profile)
+			export PATH=~/.local/bin
+			source ~/.profile
+
+	aws --version
+
+Step 5 -> Configuration
+	i) Create a new user on IAM Management Console
+	ii) Give permissions -
+		1. AmazonEC2FullAccess
+		2. AmazonRoute53FullAccess
+		3. AmazonS3FullAccess
+		4. AmazonVPCFullAccess
+		5. IAMFullAccess
+
+	aws configure
+	AWS Access Key ID [none]: AKIAJM5XLPU4JYFUVVFA
+	AWS Secret Access Key [none]: ***********************
+	Default region name [none]:us-east-2
+	Default output format [None]:
+
+Step 6 -> Create an S3 bucket
+	aws s3api create-bucket --bucket anmoll-kops-state-store --region=us-west-2 --create-bucket-con
+	figuration LocationConstraint=us-west-2
+
+Step 7 -> Allow versioning of our bucket
+	aws s3api put-bucket-versioning --bucket anmoll-kops-state-store --versioning-	configuration Status=Enabled
+
+Step 8 optional -> Store our cluster name as well as bucket name locally
+	export KOPS_CLUSTER_NAME=anmoll.k8s.local
+	export KOPS_STATE_STORE=s3://anmoll-kops-state-store
+
+Step 9 -> Create config file for cluster
+	kops create cluster --node-count=2 --node-size=t2.medium --zones=us-east-1a --name=${KOPS_CLUSTER_NAME}
+	kops edit cluster --name=${KOPS_CLUSTER_NAME}
+	(It will open vi editor, to exit vi editor press Esc then :q! then press Enter)
+
+Step 10 -> Create the cluster
+	kops update cluster --name=${KOPS_CLUSTER_NAME} --yes
+	kops validate cluster
