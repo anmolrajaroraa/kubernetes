@@ -328,10 +328,72 @@ Step 8 optional -> Store our cluster name as well as bucket name locally
 	export KOPS_STATE_STORE=s3://anmoll-kops-state-store
 
 Step 9 -> Create config file for cluster
-	kops create cluster --node-count=2 --node-size=t2.medium --zones=us-east-1a --name=${KOPS_CLUSTER_NAME}
-	kops edit cluster --name=${KOPS_CLUSTER_NAME}
+	kops create cluster --node-count=2 --node-size=t2.medium --zones=us-east-1a --name=${KOPS_CLUSTER_NAME} 	--ssh-public-key {key} --cloud="aws"
+	kops edit cluster --name=${KOPS_CLUSTER_NAME} 
 	(It will open vi editor, to exit vi editor press Esc then :q! then press Enter)
+
+
+To create sshkey -> kops create secret ssh-key {key}
+			OR
+		ssh-keygen
+
+For help regarding clusters  -> kops create cluster --help
+
 
 Step 10 -> Create the cluster
 	kops update cluster --name=${KOPS_CLUSTER_NAME} --yes
 	kops validate cluster
+
+Step 11 -> deploy Kubernetes dashboard (web ui)
+	kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/master/src/deploy/recommended/kubernetes-dashboard.yaml
+
+Install kubectl
+kubectl cluster-info
+kubectl cluster-info dump
+
+kops get secrets kube --type secret -oplaintext       //to extract password from kubernetes for dashboard
+kops get secrets admin --type secret -oplaintext      //to extract secret token
+kubectl cluster-info
+
+
+kubectl proxy
+Open the browser -> http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy
+Userid as admin
+
+
+Components of Cloud Controller Manager
+
+1. Cloud-dependent controller loops that have been taken away from KCM
+		Node controller
+		Route controller
+		Service controller
+		PersistentVolumeLabels controller
+
+	Node Controller
+	1. Initialize a node with cloud specific zones/ regions and cloud-specific instance types such as type, 	size
+	2. Obtain the node's ip adresses and hostname
+	3. If node becomes unresponsive, check the cloud whether node has been deleted or some other error 	occured
+
+	Route controller
+	It is responsible for configuring routes in the cloud (containers running on different nodes but from 	same cluster can talk to each other
+
+	Service Controller
+	It is responsible for listening to events - create, update, delete.
+	It configures cloud LoadBalancer
+
+	PersistentVolumeLabels controller
+	Automatically applies labels on volumes
+
+2. kubelet
+
+Prior to CCM, kubelet was responsible for Initialize a node with cloud specific zones/ regions and cloud-specific instance types such as type, 	size
+
+
+3. kube-apiserver
+Was responsible for PersistentVolumeLabels controller
+
+
+
+
+
+
