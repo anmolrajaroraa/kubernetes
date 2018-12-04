@@ -393,7 +393,67 @@ Prior to CCM, kubelet was responsible for Initialize a node with cloud specific 
 Was responsible for PersistentVolumeLabels controller
 
 
+Minikube - Single-node kubernetes version running locally on our machine
+
+1. VT-x or AMD-v Virtualization enabled in BIOS
+
+2. Install hypervisor
+	macOS : VirtualBox, VMWareFusion, HyperKit
+	linux : VirtualBox, KVM  (minikube start --vm-driver=none)
+	windows : VirtualBOx, Hyper-v
+
+3. Install kubectl
+	Google Cloud SDK
+
+4. Install minikube and set path
+
+5. minikube start
+
+6. Create docker image
+	docker build -t <name-of-image>:v1 .
 
 
+7.kubectl run hello-minikube --image=<name-of-image>:v1 --port=8080        //alternative image -> k8s.gcr.io/echoserver:1.10
 
+8. kubectl expose deployment hello-minikube --type=NodePort
+
+9. kubectl get pods
+
+10. minikube service hello-minikube --url
+	<IP address> -> Browser
+
+11. kubectl delete services hello-minikube
+
+12. kubectl delete deployment hello-minikube
+
+13. minikube stop (stop minikube but save cluster state)
+
+14. minikube delete (stop minikube but not saves cluster state)
+
+
+Helm (client side)
+Tiller (server side)
+
+1. Install helm
+
+2. helm init
+
+3. helm version
+
+4. tiller
+
+
+Helm - application package manager
+	-runs on top of kubernetes (Azure Resource Manager, Amazon Machine Images)
+	-describes application structure using helm-charts
+	-Charts of all images are stored in Helm Workspace
+
+Why is Helm important?
+It helps us manage, update and scale microservices easily and individually
+
+-Find and use popular packaged as charts
+-Share your own applications as charts
+-Create your reproducible builds of your applications
+-Intelligently manage our k8s objects definitions
+-Manage releases of Helm packages
 
