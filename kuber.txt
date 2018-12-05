@@ -28,7 +28,7 @@ Kubernetes vs Docker (Swarm)
 Kubernetes is a container orchestration solution.
 Orchestration - execution of a defined workflow
 
-Kubernetes, Docker Swarm, Mesos, Titus
+Kubernetes, Docker Swarm, Mesos DB/OS, Titus
 
 Kubernetes provides a container-centric management environment
 Platform as a Service(PaaS) - AWS Elastic Beanstalk, Microsoft Azure, Heroku
@@ -409,6 +409,8 @@ Minikube - Single-node kubernetes version running locally on our machine
 
 5. minikube start
 
+If you face problem in running minikube go to your home directory -> delete .minikube file -> close and open cmd again -> run the command again (minikube start)
+
 6. Create docker image
 	docker build -t <name-of-image>:v1 .
 
@@ -421,6 +423,10 @@ Minikube - Single-node kubernetes version running locally on our machine
 
 10. minikube service hello-minikube --url
 	<IP address> -> Browser
+	OR
+	curl <Ip address)
+
+To install curl -> choco install curl
 
 11. kubectl delete services hello-minikube
 
@@ -442,6 +448,43 @@ Tiller (server side)
 
 4. tiller
 
+5. helm repo update
+
+
+Use some package or a chart -
+
+1. helm install stable/mysql
+Name - cold-seastar , lame-cat
+
+2. helm inspect stable/mysql
+
+3. helm ls
+
+4. helm list
+
+5. helm delete lame-cat
+
+6. helm status lame-cat
+
+7. helm rollback lame-cat 1
+
+
+Create our own chart
+
+1. helm create mychart
+
+2. helm install --dry-run --debug ./mychart2
+
+3. helm install --dry-run --debug ./mychart2 --set service.internalPort=8080
+
+4. helm install --name myexample ./mychart2 --set service.type=NodePort
+	Notes: 1. export node_ip = ?
+		2. export node_port = ?
+		3. http://127.1.10.1:83421
+
+
+
+
 
 Helm - application package manager
 	-runs on top of kubernetes (Azure Resource Manager, Amazon Machine Images)
@@ -456,4 +499,26 @@ It helps us manage, update and scale microservices easily and individually
 -Create your reproducible builds of your applications
 -Intelligently manage our k8s objects definitions
 -Manage releases of Helm packages
+
+Helm uses a packaging format called as charts. 
+A chart is a manifest of files that describer K8s resources.
+
+
+Kompose = Kubernetes + Docker Compose
+
+1. kompose convert -f docker-compose.yaml (to convert docker compose resource into k8s resource)
+
+2. kompose up
+
+3. kubectl get pods
+
+4. kubectl get deployment
+
+5. kubectl get service
+
+6. kubectl get pvc
+
+
+
+
 
