@@ -55,6 +55,77 @@ Master components - control plane, making global decisions, detect and respond t
 
 containers -> pods -> nodes -> cluster -> master components
 
+
+Networking
+1. containers and pods
+2. services - abstraction layer for pods to be ephemeral
+3. ingress and traffic from our cluster
+
+Pod - consists of one or more containers that are co-located on the same host and share same network stack and volumes.
+
+Network stack - means containers in a pod can reach each other on localhost
+http://localhost:80
+
+eth0 - physical network interface
+
+docker0 - bridge
+
+veth0 - virtual network interface
+
+ipv4 - 172.17.0.0/24 (32-bit)
+cidr - cross interdomain routing
+
+10.2.1.0
+00001010.00000010.00000001.00000000
+
+gcloud container clusters describe <cluster>
+
+Requirements for the proxy :-
+1. It is durable
+2. Resistant to failure
+3. Have a list of healthy servers it can forward requests to 
+
+DNS - Domain Name Service
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 Pods - container for containers. Inside a pod, containers share same resources and local network. They can communicate but they still maintain isolation. At a time, replicas of your pod should be running to allow load balancing, failure resistance
 
 Node - Smallest unit of computing hardware. Simply viewing each machine as a set of CPU and RAM resources
@@ -517,6 +588,10 @@ Kompose = Kubernetes + Docker Compose
 5. kubectl get service
 
 6. kubectl get pvc
+
+
+
+
 
 
 
