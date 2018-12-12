@@ -61,22 +61,31 @@ Networking
 2. services - abstraction layer for pods to be ephemeral
 3. ingress and traffic from our cluster
 
-Pod - consists of one or more containers that are co-located on the same host and share same network stack and volumes.
+Pod - consists of one or more containers that are co-located on the same host and share same network stack and volumes. Pod is ephemeral
+
+Intra-pod communication - shared network stack
+Inter-pod communication (east-west traffic)
+Outside world communication (north-south traffic)
 
 Network stack - means containers in a pod can reach each other on localhost
 http://localhost:80
 
-eth0 - physical network interface
+eth0 - physical network interface of node
 
 docker0 - bridge
 
-veth0 - virtual network interface
+veth0 - virtual network interface for container
+
+Overlay network <-> pod network
 
 ipv4 - 172.17.0.0/24 (32-bit)
 cidr - cross interdomain routing
 
 10.2.1.0
 00001010.00000010.00000001.00000000
+
+10.0.0.0/14
+10.3.240.0/20
 
 gcloud container clusters describe <cluster>
 
@@ -87,44 +96,25 @@ Requirements for the proxy :-
 
 DNS - Domain Name Service
 
+Kubernetes uses linux kernel feature called netfilter
+And user space interface to netfilter called iptables
 
+Netfilter is a rules-based packet-processing engine
+Netfilter matches packets against some rules and it takes specified actions
+Netfilter is a kernel space proxy.
 
+OSI model layers :-
+Application
+Presentation
+Session
+Transport
+Network
+Data link
+Phyical
 
+30000-32767 -> 2768 ports
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Ingress- Setting up a load balancer to handle multiple backend services
 
 Pods - container for containers. Inside a pod, containers share same resources and local network. They can communicate but they still maintain isolation. At a time, replicas of your pod should be running to allow load balancing, failure resistance
 
@@ -151,8 +141,6 @@ Step 1 -> Build docker container image
 
 4. docker build -t name:tag
 docker build -t gcr.io/k8stest2-223806/hello-app:v1 .
-
- 
 
 5. docker images
 
@@ -231,17 +219,10 @@ K8s deployment strategies
 Pro : Application state is entirely renewed
 Con : Downtime that depends on both shutdown and boot duration of the application
 
-
-
-
 spec:
 	replicas:3
 	strategy:
 		type:Recreate
-
-
-
-
 
 2. Ramped -> Release a new version in a rolling update fashion, one after the other
 	Best for slow rollout
@@ -403,13 +384,11 @@ Step 9 -> Create config file for cluster
 	kops edit cluster --name=${KOPS_CLUSTER_NAME} 
 	(It will open vi editor, to exit vi editor press Esc then :q! then press Enter)
 
-
 To create sshkey -> kops create secret ssh-key {key}
 			OR
 		ssh-keygen
 
 For help regarding clusters  -> kops create cluster --help
-
 
 Step 10 -> Create the cluster
 	kops update cluster --name=${KOPS_CLUSTER_NAME} --yes
@@ -426,11 +405,9 @@ kops get secrets kube --type secret -oplaintext       //to extract password from
 kops get secrets admin --type secret -oplaintext      //to extract secret token
 kubectl cluster-info
 
-
 kubectl proxy
 Open the browser -> http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy
 Userid as admin
-
 
 Components of Cloud Controller Manager
 
@@ -459,10 +436,8 @@ Components of Cloud Controller Manager
 
 Prior to CCM, kubelet was responsible for Initialize a node with cloud specific zones/ regions and cloud-specific instance types such as type, 	size
 
-
 3. kube-apiserver
 Was responsible for PersistentVolumeLabels controller
-
 
 Minikube - Single-node kubernetes version running locally on our machine
 
@@ -485,7 +460,6 @@ If you face problem in running minikube go to your home directory -> delete .min
 6. Create docker image
 	docker build -t <name-of-image>:v1 .
 
-
 7.kubectl run hello-minikube --image=<name-of-image>:v1 --port=8080        //alternative image -> k8s.gcr.io/echoserver:1.10
 
 8. kubectl expose deployment hello-minikube --type=NodePort
@@ -503,10 +477,9 @@ To install curl -> choco install curl
 
 12. kubectl delete deployment hello-minikube
 
-13. minikube stop (stop minikube but save cluster state)
+13. minikube stop (stop minikube but save cluster state and stop VM also)
 
-14. minikube delete (stop minikube but not saves cluster state)
-
+14. minikube delete (stop minikube but not saves cluster state) //if you use this directly VM will become orphaned
 
 Helm (client side)
 Tiller (server side)
@@ -520,7 +493,6 @@ Tiller (server side)
 4. tiller
 
 5. helm repo update
-
 
 Use some package or a chart -
 
@@ -539,7 +511,6 @@ Name - cold-seastar , lame-cat
 
 7. helm rollback lame-cat 1
 
-
 Create our own chart
 
 1. helm create mychart
@@ -552,10 +523,6 @@ Create our own chart
 	Notes: 1. export node_ip = ?
 		2. export node_port = ?
 		3. http://127.1.10.1:83421
-
-
-
-
 
 Helm - application package manager
 	-runs on top of kubernetes (Azure Resource Manager, Amazon Machine Images)
@@ -574,7 +541,6 @@ It helps us manage, update and scale microservices easily and individually
 Helm uses a packaging format called as charts. 
 A chart is a manifest of files that describer K8s resources.
 
-
 Kompose = Kubernetes + Docker Compose
 
 1. kompose convert -f docker-compose.yaml (to convert docker compose resource into k8s resource)
@@ -588,12 +554,3 @@ Kompose = Kubernetes + Docker Compose
 5. kubectl get service
 
 6. kubectl get pvc
-
-
-
-
-
-
-
-
-
