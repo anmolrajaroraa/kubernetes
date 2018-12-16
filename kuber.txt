@@ -554,3 +554,7 @@ Kompose = Kubernetes + Docker Compose
 5. kubectl get service
 
 6. kubectl get pvc
+
+
+Please take this survey:)
+https://goo.gl/forms/QvqfNexKzWiWLHLw2
